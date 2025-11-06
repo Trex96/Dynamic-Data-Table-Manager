@@ -1,65 +1,200 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { DataTable } from '@/components/table/DataTable';
+import { ColumnManager } from '@/components/table/ColumnManager';
+import { CSVImport } from '@/components/table/CSVImport';
+import { CSVExport } from '@/components/table/CSVExport';
+import { useTableData } from '@/hooks/useTableData';
+import { useTheme } from 'next-themes';
+
+
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  IconButton, 
+  Box, 
+  Container, 
+  Paper, 
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
+import { 
+  Brightness4 as DarkModeIcon, 
+  Brightness7 as LightModeIcon,
+  Storage as DatabaseIcon,
+  CloudUpload as UploadIcon,
+  CloudDownload as DownloadIcon
+} from '@mui/icons-material';
 
 export default function Home() {
+  const { setTheme: setReduxTheme, preferences } = useTableData();
+  const { theme, setTheme } = useTheme();
+  const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+
+  useEffect(() => {
+
+    if (preferences.theme && preferences.theme !== theme) {
+      setTheme(preferences.theme);
+    }
+  }, [preferences.theme, setTheme, theme]);
+
+
+  useEffect(() => {
+    if (theme && theme !== preferences.theme) {
+      setReduxTheme(theme as 'light' | 'dark');
+    }
+  }, [theme, preferences.theme, setReduxTheme]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    setReduxTheme(newTheme);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <AppBar position="static" elevation={1}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <DatabaseIcon />
+            <Typography variant="h6" component="div">
+              Dynamic Data Table Manager
+            </Typography>
+          </Box>
+          <IconButton 
+            color="inherit" 
+            onClick={toggleTheme} 
+            aria-label="toggle theme"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            {!mounted ? (
+              <LightModeIcon />
+            ) : theme === 'light' ? (
+              <DarkModeIcon />
+            ) : (
+              <LightModeIcon />
+            )}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="lg" sx={{ flexGrow: 1, py: 3 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Data Management Dashboard
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Manage your data with advanced sorting, filtering, and CRUD operations
+          </Typography>
+        </Box>
+
+        <Paper sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+            <Box>
+              <Typography variant="h5" component="h2">
+                Data Table
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                View and manage your structured data
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Button 
+                variant="outlined" 
+                startIcon={<UploadIcon />}
+                onClick={() => setIsImportOpen(true)}
+              >
+                Import
+              </Button>
+              <Button 
+                variant="outlined" 
+                startIcon={<DownloadIcon />}
+                onClick={() => setIsExportOpen(true)}
+              >
+                Export
+              </Button>
+              <Button 
+                variant="outlined" 
+                onClick={() => setIsColumnManagerOpen(true)}
+              >
+                Columns
+              </Button>
+            </Box>
+          </Box>
+          <DataTable
+            onManageColumns={() => setIsColumnManagerOpen(true)}
+            onImportCSV={() => setIsImportOpen(true)}
+            onExportCSV={() => setIsExportOpen(true)}
+          />
+        </Paper>
+      </Container>
+
+      <Dialog 
+        open={isColumnManagerOpen} 
+        onClose={() => setIsColumnManagerOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Manage Columns</DialogTitle>
+        <DialogContent>
+          <ColumnManager 
+            open={isColumnManagerOpen} 
+            onOpenChange={setIsColumnManagerOpen} 
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsColumnManagerOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog 
+        open={isImportOpen} 
+        onClose={() => setIsImportOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Import CSV</DialogTitle>
+        <DialogContent>
+          <CSVImport 
+            open={isImportOpen} 
+            onOpenChange={setIsImportOpen} 
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsImportOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      
+      <Dialog 
+        open={isExportOpen} 
+        onClose={() => setIsExportOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Export CSV</DialogTitle>
+        <DialogContent>
+          <CSVExport 
+            open={isExportOpen} 
+            onOpenChange={setIsExportOpen} 
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsExportOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }

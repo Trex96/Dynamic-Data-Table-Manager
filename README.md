@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dynamic Data Table Manager
+
+A modern, production-ready Dynamic Data Table Manager built with Next.js 14, Redux Toolkit, and Material UI. This application provides a comprehensive solution for managing tabular data with full CRUD operations, CSV import/export, real-time filtering, sorting, and customizable columns.
+
+## Features
+
+### Core Features
+- **Dynamic Data Table**: Display data in a responsive table with row striping and sticky headers
+- **Column Sorting**: Click column headers to sort data in ascending or descending order
+- **Global Search**: Search across all visible columns with debounced input
+- **Pagination**: Navigate through data with configurable rows per page
+- **Manage Columns**: Show/hide columns, add custom fields, and reorder columns via drag-and-drop
+- **CSV Import**: Import data from CSV files with validation and preview
+- **CSV Export**: Export data to CSV with various options
+
+### Bonus Features
+- **Inline Editing**: Double-click cells to edit data with type-specific input controls
+- **Row Actions**: Edit, delete, and duplicate rows with confirmation dialogs
+- **Bulk Actions**: Select multiple rows for batch operations
+- **Theme Toggle**: Switch between light and dark modes
+- **Responsive Design**: Adapts to different screen sizes
+
+## Tech Stack
+
+- **Next.js 14** (App Router with TypeScript)
+- **Redux Toolkit** (state management)
+- **Redux Persist** (persist preferences)
+- **Material UI** (UI components)
+- **Tailwind CSS** (styling)
+- **React Hook Form** (form handling)
+- **Zod** (validation)
+- **PapaParse** (CSV parsing)
+- **FileSaver.js** (CSV export)
+- **@dnd-kit** (drag-and-drop functionality)
+- **next-themes** (theme management)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. Navigate to the project directory:
+   ```bash
+   cd dynamic-data-table
+   ```
+
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Run the development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build the application:
+```bash
+npm run build
+```
 
-## Learn More
+Start the production server:
+```bash
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                 # Next.js app router pages
+├── components/          # React components
+│   ├── table/           # Table-related components
+│   └── theme/           # Theme-related components
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions and sample data
+└── store/               # Redux store configuration
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Redux Store Structure
 
-## Deploy on Vercel
+The Redux store manages the following state:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```typescript
+{
+  data: TableRow[]              // All table data
+  columns: ColumnConfig[]       // Column definitions
+  searchTerm: string            // Current search
+  sorting: {
+    sortBy: string | null
+    sortDirection: 'asc' | 'desc' | null
+  }
+  pagination: {
+    currentPage: number
+    rowsPerPage: number
+  }
+  ui: {
+    loading: boolean
+    editingRowIds: string[]     // Rows in edit mode
+    selectedRowIds: string[]    // Bulk selected
+  }
+  preferences: {
+    theme: 'light' | 'dark'
+    columnOrder: string[]
+  }
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
